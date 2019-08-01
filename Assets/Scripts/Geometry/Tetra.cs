@@ -12,8 +12,8 @@ namespace delaunayTriangulation
         public Vertex P3;
         public Vertex P4;
 
-        public Tetra[] Neighbors = new Tetra[4];
-        public TriangleFace[] Faces = new TriangleFace[4];
+        public HashSet<Tetra> Neighbors = new HashSet<Tetra>();
+        public HashSet<TriangleFace> Faces = new HashSet<TriangleFace>();
 
         private float _a;
         private Vector3 _d;
@@ -50,6 +50,10 @@ namespace delaunayTriangulation
                 MakeTetraDirect();
             }
             ComputeCircumcircleInfos();
+            Faces.Add(new TriangleFace(P1, P2, P3, this));
+            Faces.Add(new TriangleFace(P1, P2, P4, this));
+            Faces.Add(new TriangleFace(P1, P3, P4, this));
+            Faces.Add(new TriangleFace(P2, P3, P4, this));
         }
 
         public Tetra(TriangleFace face1, TriangleFace face2, TriangleFace face3, TriangleFace face4)
@@ -63,14 +67,14 @@ namespace delaunayTriangulation
                 MakeTetraDirect();
             }
             ComputeCircumcircleInfos();
-            Faces[0] = face1;
-            Faces[1] = face2;
-            Faces[2] = face3;
-            Faces[3] = face4;
-            Neighbors[0] = face1.GetOtherTetraThan(this);
-            Neighbors[1] = face2.GetOtherTetraThan(this);
-            Neighbors[2] = face3.GetOtherTetraThan(this);
-            Neighbors[3] = face4.GetOtherTetraThan(this);
+            Faces.Add(face1);
+            Faces.Add(face2);
+            Faces.Add(face3);
+            Faces.Add(face4);
+            Neighbors.Add(face1.GetOtherTetraThan(this));
+            Neighbors.Add(face2.GetOtherTetraThan(this));
+            Neighbors.Add(face3.GetOtherTetraThan(this));
+            Neighbors.Add(face4.GetOtherTetraThan(this));
         }
 
         public Tetra(TriangleFace baseFace, Vertex vertex)
@@ -84,8 +88,17 @@ namespace delaunayTriangulation
                 MakeTetraDirect();
             }
             ComputeCircumcircleInfos();
-            Faces[0] = baseFace;
-            Neighbors[0] = baseFace.GetOtherTetraThan(this);
+            Faces.Add(baseFace);
+            Neighbors.Add(baseFace.GetOtherTetraThan(this));
+        }
+
+        public void AddNeighbor(TriangleFace face)
+        {
+            if (Faces.Count < 4 && Neighbors.Count < 4)
+            {
+                Faces.Add(face);
+                Neighbors.Add(face.GetOtherTetraThan(this));
+            }
         }
 
         public bool IsNeighborOf(Tetra otherTetra)
@@ -95,6 +108,32 @@ namespace delaunayTriangulation
             tetraVertices.IntersectWith(otherTetraVertices);
             // Two tetrahedrons are neighbors if and only if they share 3 vertices;
             return tetraVertices.Count == 3;
+        }
+
+        public bool HasACommonVertexWith(Tetra otherTetra)
+        {
+            HashSet<Vertex> tetraVertices = new HashSet<Vertex>() { P1, P2, P3, P4 };
+            HashSet<Vertex> otherTetraVertices = new HashSet<Vertex>() { otherTetra.P1, otherTetra.P2, otherTetra.P3, otherTetra.P4 };
+            tetraVertices.IntersectWith(otherTetraVertices);
+            return tetraVertices.Count == 1;
+        }
+
+        public void GetCommonVerticesWith(Tetra otherTetra, out Vertex p1, out Vertex p2, out Vertex p3)
+        {
+            if (IsNeighborOf(otherTetra))
+            {
+                HashSet<Vertex> tetraVertices = new HashSet<Vertex>() { P1, P2, P3, P4 };
+                HashSet<Vertex> otherTetraVertices = new HashSet<Vertex>() { otherTetra.P1, otherTetra.P2, otherTetra.P3, otherTetra.P4 };
+                tetraVertices.IntersectWith(otherTetraVertices);
+                List<Vertex> commonVertices = new List<Vertex>(tetraVertices);
+                p1 = commonVertices[0];
+                p2 = commonVertices[1];
+                p3 = commonVertices[2];
+            }
+            else
+            {
+                throw new Exception("The two tetrahedrons are not neighbors");
+            }
         }
 
         private void MakeTetraDirect()

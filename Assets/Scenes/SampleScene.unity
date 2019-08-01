@@ -494,6 +494,19 @@ MonoBehaviour:
   _sphereMesh: {fileID: 264579613}
   _redMaterial: {fileID: 2100000, guid: f156ca41bd7cf1b48980e843706fcb17, type: 2}
   _greenMaterial: {fileID: 2100000, guid: 593963871bc371140b4b2e99ce2bbfde, type: 2}
+--- !u!114 &1132644366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1132644363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cff3c3669e0cec94fa9658245c97b242, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _meshFilter: {fileID: 1132644364}
 --- !u!43 &2107651792
 Mesh:
   m_ObjectHideFlags: 0

@@ -10,8 +10,8 @@ namespace delaunayTriangulation
         public Vertex P2;
         public Vertex P3;
 
-        public Tetra rightTetra;
-        public Tetra leftTetra;
+        public Tetra RightTetra;
+        public Tetra LeftTetra;
 
         public TriangleFace(Vertex p1, Vertex p2, Vertex p3)
         {
@@ -20,15 +20,33 @@ namespace delaunayTriangulation
             P3 = p3;
         }
 
+        public TriangleFace(Vertex p1, Vertex p2, Vertex p3, Tetra tetra)
+        {
+            P1 = p1;
+            P2 = p2;
+            P3 = p3;
+            RightTetra = tetra;
+        }
+
+        public TriangleFace(Tetra tetra, Tetra otherTetra)
+        {
+            tetra.GetCommonVerticesWith(otherTetra, out Vertex p1, out Vertex p2, out Vertex p3);
+            P1 = p1;
+            P2 = p2;
+            P3 = p3;
+            LeftTetra = tetra;
+            RightTetra = otherTetra;
+        }
+
         public Tetra GetOtherTetraThan(Tetra tetra)
         {
-            if (tetra == rightTetra)
+            if (tetra == RightTetra)
             {
-                return leftTetra;
+                return LeftTetra;
             }
-            else if (tetra == leftTetra)
+            else if (tetra == LeftTetra)
             {
-                return rightTetra;
+                return RightTetra;
             }
             else
             {
@@ -43,8 +61,8 @@ namespace delaunayTriangulation
                    EqualityComparer<Vertex>.Default.Equals(P1, edge.P1) &&
                    EqualityComparer<Vertex>.Default.Equals(P2, edge.P2) &&
                    EqualityComparer<Vertex>.Default.Equals(P3, edge.P3) &&
-                   EqualityComparer<Tetra>.Default.Equals(rightTetra, edge.rightTetra) &&
-                   EqualityComparer<Tetra>.Default.Equals(leftTetra, edge.leftTetra);
+                   EqualityComparer<Tetra>.Default.Equals(RightTetra, edge.RightTetra) &&
+                   EqualityComparer<Tetra>.Default.Equals(LeftTetra, edge.LeftTetra);
         }
 
         public override int GetHashCode()
@@ -53,8 +71,8 @@ namespace delaunayTriangulation
             hashCode = hashCode * -1521134295 + EqualityComparer<Vertex>.Default.GetHashCode(P1);
             hashCode = hashCode * -1521134295 + EqualityComparer<Vertex>.Default.GetHashCode(P2);
             hashCode = hashCode * -1521134295 + EqualityComparer<Vertex>.Default.GetHashCode(P3);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Tetra>.Default.GetHashCode(rightTetra);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Tetra>.Default.GetHashCode(leftTetra);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Tetra>.Default.GetHashCode(RightTetra);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Tetra>.Default.GetHashCode(LeftTetra);
             return hashCode;
         }
     }

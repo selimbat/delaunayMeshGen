@@ -21,7 +21,7 @@ namespace delaunayTriangulation
         {
             Mesh mesh = _meshFilter.mesh;
             _vector3vertices = mesh.vertices;
-            _numberOfVertices = _vertices.Length;
+            _numberOfVertices = _vector3vertices.Length;
             FillVeticesArray();
             _normals = mesh.normals;
             _triangles = mesh.triangles;
@@ -32,6 +32,7 @@ namespace delaunayTriangulation
 
         private void FillVeticesArray()
         {
+            _vertices = new Vertex[_numberOfVertices];
             for (int i = 0; i < _numberOfVertices; i++)
             {
                 _vertices[i] = new Vertex(VertexType.SurfaceVertex, _vector3vertices[i]);
@@ -77,9 +78,18 @@ namespace delaunayTriangulation
                     {
                         if (tetra.IsNeighborOf(otherTetra))
                         {
-
+                            TriangleFace face = new TriangleFace(tetra, otherTetra);
+                            tetra.AddNeighbor(face);
                         }
                     }
+                    triangulation.Add(tetra);
+                }
+            }
+            foreach (Tetra tetra in triangulation)
+            {
+                if (tetra.HasACommonVertexWith(_superTetra))
+                {
+                    triangulation.Remove(tetra);
                 }
             }
         }

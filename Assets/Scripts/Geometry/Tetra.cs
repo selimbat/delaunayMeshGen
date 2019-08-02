@@ -12,7 +12,6 @@ namespace delaunayTriangulation
         public Vertex P3;
         public Vertex P4;
 
-        public HashSet<Tetra> Neighbors = new HashSet<Tetra>();
         public HashSet<TriangleFace> Faces = new HashSet<TriangleFace>();
 
         private float _a;
@@ -71,10 +70,6 @@ namespace delaunayTriangulation
             Faces.Add(face2);
             Faces.Add(face3);
             Faces.Add(face4);
-            Neighbors.Add(face1.GetOtherTetraThan(this));
-            Neighbors.Add(face2.GetOtherTetraThan(this));
-            Neighbors.Add(face3.GetOtherTetraThan(this));
-            Neighbors.Add(face4.GetOtherTetraThan(this));
         }
 
         public Tetra(TriangleFace baseFace, Vertex vertex)
@@ -88,16 +83,22 @@ namespace delaunayTriangulation
                 MakeTetraDirect();
             }
             ComputeCircumcircleInfos();
+            if (!baseFace.HasOneNeighborTetraNull())
+            {
+                throw new Exception("Trying to construct a tetrahedron with a base that already has 2 neighboring tetrahedrons registered.");
+            }
+            else
+            {
+                baseFace.RegisterNeighbor(this);
+            }
             Faces.Add(baseFace);
-            Neighbors.Add(baseFace.GetOtherTetraThan(this));
         }
 
         public void AddNeighbor(TriangleFace face)
         {
-            if (Faces.Count < 4 && Neighbors.Count < 4)
+            if (Faces.Count < 4)
             {
                 Faces.Add(face);
-                Neighbors.Add(face.GetOtherTetraThan(this));
             }
         }
 
@@ -226,6 +227,10 @@ namespace delaunayTriangulation
         public override bool Equals(object obj)
         {
             Tetra tetra = obj as Tetra;
+            if (tetra == null)
+            {
+                return false;
+            }
             Vertex[] tetraVertices = new Vertex[4];
             tetraVertices[0] = tetra.P1;
             tetraVertices[1] = tetra.P2;

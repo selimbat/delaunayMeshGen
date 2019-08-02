@@ -41,6 +41,11 @@ namespace delaunayTriangulation
 
         public void ComputeDelaunayTriangulation()
         {
+            StartCoroutine(ComputeDelaunayTriangulationCoroutine());
+        }
+
+        public IEnumerator ComputeDelaunayTriangulationCoroutine()
+        {
             HashSet<Tetra> triangulation = new HashSet<Tetra> { _superTetra };
             foreach (Vertex vertex in _vertices)
             {
@@ -53,28 +58,36 @@ namespace delaunayTriangulation
                     }
                 }
                 HashSet<TriangleFace> polyHole = new HashSet<TriangleFace>();
-                foreach(Tetra badTetra in badTetras)
+                foreach (Tetra badTetra in badTetras)
                 {
-                    foreach(TriangleFace face in badTetra.Faces)
+                    foreach (TriangleFace face in badTetra.Faces)
                     {
-                        if (!badTetras.Contains(face.GetOtherTetraThan(badTetra)))
+                        Tetra otherTetraOfFace = face.GetOtherTetraThan(badTetra);
+                        if (!badTetras.Contains(otherTetraOfFace))
                         {
-                            polyHole.Add(face);
+                            TriangleFace newFace = new TriangleFace(face.P1, face.P2, face.P3, otherTetraOfFace);
+                            polyHole.Add(newFace);
                         }
                     }
                 }
-                foreach(Tetra badTetra in badTetras)
+                foreach (Tetra badTetra in badTetras)
                 {
                     triangulation.Remove(badTetra);
                 }
+                //debug
+                foreach(Tetra tetra in triangulation)
+                {
+                    tetra.Show(Color.green, 0.2f);
+                }
+                //!debug
                 HashSet<Tetra> newTetras = new HashSet<Tetra>();
-                foreach(TriangleFace face in polyHole)
+                foreach (TriangleFace face in polyHole)
                 {
                     newTetras.Add(new Tetra(face, vertex));
                 }
-                foreach(Tetra tetra in newTetras)
+                foreach (Tetra tetra in newTetras)
                 {
-                    foreach(Tetra otherTetra in newTetras)
+                    foreach (Tetra otherTetra in newTetras)
                     {
                         if (tetra.IsNeighborOf(otherTetra))
                         {
@@ -82,8 +95,10 @@ namespace delaunayTriangulation
                             tetra.AddNeighbor(face);
                         }
                     }
+                    tetra.Show(Color.cyan, 0.2f);
                     triangulation.Add(tetra);
                 }
+                yield return new WaitForSeconds(0.2f);
             }
             foreach (Tetra tetra in triangulation)
             {

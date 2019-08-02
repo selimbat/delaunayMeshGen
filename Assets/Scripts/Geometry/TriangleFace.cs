@@ -26,6 +26,7 @@ namespace delaunayTriangulation
             P2 = p2;
             P3 = p3;
             RightTetra = tetra;
+            LeftTetra = null;
         }
 
         public TriangleFace(Tetra tetra, Tetra otherTetra)
@@ -40,18 +41,48 @@ namespace delaunayTriangulation
 
         public Tetra GetOtherTetraThan(Tetra tetra)
         {
-            if (tetra == RightTetra)
+            if (tetra.Equals(RightTetra))
             {
                 return LeftTetra;
             }
-            else if (tetra == LeftTetra)
+            else if (tetra.Equals(LeftTetra))
             {
                 return RightTetra;
             }
             else
             {
+                tetra.Show(Color.red, 100);
+                Show(Color.cyan, 100);
                 throw new System.Exception("The given tetrahedron is not one of the neighbors of the triangle face");
             }
+        }
+
+        public void RegisterNeighbor(Tetra tetra)
+        {
+            if (LeftTetra == null)
+            {
+                LeftTetra = tetra;
+            }
+            else if (RightTetra == null)
+            {
+                RightTetra = tetra;
+            }
+            else
+            {
+                throw new System.Exception("Trying to register a neighboring tetrahedron to a triangle that already has two neighbors.");
+            }
+        }
+
+        public bool HasOneNeighborTetraNull()
+        {
+            return (RightTetra == null) || (LeftTetra == null);
+        }
+
+        public void Show(Color color, float duration)
+        {
+            Debug.DrawLine(P1.Pos, P2.Pos, color, duration);
+            Debug.DrawLine(P1.Pos, P3.Pos, color, duration);
+            Debug.DrawLine(P2.Pos, P3.Pos, color, duration);
         }
 
         public override bool Equals(object obj)

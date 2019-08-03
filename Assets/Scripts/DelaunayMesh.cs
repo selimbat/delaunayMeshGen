@@ -17,9 +17,9 @@ namespace delaunayTriangulation
 
         private Tetra _superTetra;
 
-        public void Awake()
+        public void Init()
         {
-            Mesh mesh = _meshFilter.mesh;
+            Mesh mesh = _meshFilter.sharedMesh;
             _vector3vertices = mesh.vertices;
             _numberOfVertices = _vector3vertices.Length;
             FillVeticesArray();

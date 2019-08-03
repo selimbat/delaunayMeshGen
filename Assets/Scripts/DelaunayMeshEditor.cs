@@ -13,6 +13,10 @@ namespace delaunayTriangulation
             DrawDefaultInspector();
 
             DelaunayMesh delaunayMesh = (DelaunayMesh)target;
+            if (GUILayout.Button("Init"))
+            {
+                delaunayMesh.Init();
+            }
             if (GUILayout.Button("Compute Delaunay Triangulation"))
             {
                 delaunayMesh.ComputeDelaunayTriangulation();

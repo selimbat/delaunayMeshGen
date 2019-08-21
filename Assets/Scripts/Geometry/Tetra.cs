@@ -116,7 +116,7 @@ namespace delaunayTriangulation
             HashSet<Vertex> tetraVertices = new HashSet<Vertex>() { P1, P2, P3, P4 };
             HashSet<Vertex> otherTetraVertices = new HashSet<Vertex>() { otherTetra.P1, otherTetra.P2, otherTetra.P3, otherTetra.P4 };
             tetraVertices.IntersectWith(otherTetraVertices);
-            return tetraVertices.Count == 1;
+            return tetraVertices.Count >= 1;
         }
 
         public void GetCommonVerticesWith(Tetra otherTetra, out Vertex p1, out Vertex p2, out Vertex p3)
@@ -181,6 +181,21 @@ namespace delaunayTriangulation
             Debug.DrawLine(P3.Pos, P4.Pos, color, duration);
         }
 
+        public static void Show(HashSet<Tetra> tetras, Color color, float duration)
+        {
+            foreach (Tetra tetra in tetras)
+            {
+                tetra.Show(color, duration);
+            }
+        }
+
+        public void ShowCircumsphere(Color color, float duration)
+        {
+            Vector3 circumCenter = new Vector3(_d.x / (2 * _a), _d.y / (2 * _a), _d.z / (2 * _a));
+            float circumRadius = Mathf.Sqrt(_d.sqrMagnitude - 4 * _a * _c) / (2 * Mathf.Abs(_a));
+            ExtDrawGuizmos.DebugWireSphere(circumCenter, color, circumRadius, duration, false);
+        }
+
         private void ComputeCircumcircleInfos()
         {
             _a = ExtMathf.Determinant3x3(P1.Pos, P2.Pos, P3.Pos)
@@ -213,15 +228,12 @@ namespace delaunayTriangulation
                - n2 * ExtMathf.Determinant3x3(P1.Pos, P3.Pos, P4.Pos)
                + n3 * ExtMathf.Determinant3x3(P1.Pos, P2.Pos, P4.Pos)
                - n4 * ExtMathf.Determinant3x3(P1.Pos, P2.Pos, P3.Pos);
-            /*
-            Vector3 circumCenter = new Vector3(_d.x / (2 * _a), _d.y / (2 * _a), _d.z / (2 * _a));
-            float circumRadius = Mathf.Sqrt(_d.sqrMagnitude - 4 * _a * _c) / (2 * Mathf.Abs(_a));
-            ExtDrawGuizmos.DebugWireSphere(circumCenter, Color.magenta, circumRadius, 1000, false);*/
         }
 
         public bool IsPointInCircumcircle(Vector3 newVertex)
         {
-            return _a * newVertex.sqrMagnitude - Vector3.Dot(newVertex, _d) + _c <= 0;
+            float value = _a * newVertex.sqrMagnitude - Vector3.Dot(newVertex, _d) + _c;
+            return value < -0.00001f; // We have to avoid float inaccuracy
         }
 
         public override bool Equals(object obj)

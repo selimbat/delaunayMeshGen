@@ -21,6 +21,10 @@ namespace delaunayTriangulation
             {
                 delaunayMesh.ComputeDelaunayTriangulation();
             }
+            if (GUILayout.Button("Show Triangulation Tetra by Tetra"))
+            {
+                delaunayMesh.ShowTriangulationTetraByTetra();
+            }
         }
 
     }
